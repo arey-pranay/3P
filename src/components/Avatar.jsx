@@ -4,17 +4,32 @@ Command: npx gltfjsx@6.2.13 .\public\models\NormalGLB.glb
 */
 
 import React, { useEffect, useRef } from "react";
-import { useGLTF, useFBX, useAnimations } from "@react-three/drei";
+import * as THREE from "three";
 
+import { useGLTF, useFBX, useAnimations } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { useControls } from "leva";
 export function Avatar(props) {
   const group = useRef();
   const { nodes, materials } = useGLTF("models/NormalGLB.glb");
   const { animations: typingAnimation } = useFBX("animations/ReadyTyping.fbx");
   typingAnimation[0].name = "Typing";
   const { actions } = useAnimations(typingAnimation, group);
+  const { headControl, cursorFollow } = useControls({
+    headControl: false,
+    cursorFollow: false,
+  });
   useEffect(() => {
     actions["Typing"].reset().play();
   }, []);
+  useFrame((state) => {
+    if (headControl)
+      group.current.getObjectByName("Head").lookAt(state.camera.position);
+    if (cursorFollow) {
+      const target = new THREE.Vector3(state.mouse.x, state.mouse.y, 1);
+      group.current.getObjectByName("Spine1").lookAt(target);
+    }
+  });
   return (
     <group ref={group} {...props} dispose={null}>
       <group rotation-x={-Math.PI / 2}>
