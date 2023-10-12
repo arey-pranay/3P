@@ -10,18 +10,33 @@ import { useGLTF, useFBX, useAnimations } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useControls } from "leva";
 export function Avatar(props) {
+  const { animation } = props;
   const group = useRef();
   const { nodes, materials } = useGLTF("models/NormalGLB.glb");
   const { animations: typingAnimation } = useFBX("animations/ReadyTyping.fbx");
+  const { animations: fallingAnimation } = useFBX(
+    "animations/ReadyFalling.fbx"
+  );
+  const { animations: idleAnimation } = useFBX("animations/ReadyIdle.fbx");
+
   typingAnimation[0].name = "Typing";
-  const { actions } = useAnimations(typingAnimation, group);
+  fallingAnimation[0].name = "Falling";
+  idleAnimation[0].name = "Idle";
+
+  const { actions } = useAnimations(
+    [typingAnimation[0], fallingAnimation[0], idleAnimation[0]],
+    group
+  );
   const { headControl, cursorFollow } = useControls({
     headControl: false,
     cursorFollow: false,
   });
   useEffect(() => {
-    actions["Typing"].reset().play();
-  }, []);
+    actions[animation].reset().fadeIn(0.5).play();
+    return () => {
+      actions[animation].reset().fadeOut(0.5);
+    };
+  }, [animation]);
   useFrame((state) => {
     //go to blender, go to Pose Mode, Armature, Viewport display, then hit on
     //Check which bone or vertex group you want to edit or work with
