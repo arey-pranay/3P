@@ -23,6 +23,8 @@ export function Avatar(props) {
     actions["Typing"].reset().play();
   }, []);
   useFrame((state) => {
+    //go to blender, go to Pose Mode, Armature, Viewport display, then hit on
+    //Check which bone or vertex group you want to edit or work with
     if (headControl)
       group.current.getObjectByName("Head").lookAt(state.camera.position);
     if (cursorFollow) {
