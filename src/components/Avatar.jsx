@@ -27,9 +27,10 @@ export function Avatar(props) {
     [typingAnimation[0], fallingAnimation[0], idleAnimation[0]],
     group
   );
-  const { headControl, cursorFollow } = useControls({
+  const { headControl, cursorFollow, wireframe } = useControls({
     headControl: false,
     cursorFollow: false,
+    wireframe: false,
   });
   useEffect(() => {
     actions[animation].reset().fadeIn(0.5).play();
@@ -37,6 +38,11 @@ export function Avatar(props) {
       actions[animation].reset().fadeOut(0.5);
     };
   }, [animation]);
+  useEffect(() => {
+    Object.values(materials).forEach((material) => {
+      material.wireframe = wireframe;
+    });
+  }, [wireframe]);
   useFrame((state) => {
     //go to blender, go to Pose Mode, Armature, Viewport display, then hit on
     //Check which bone or vertex group you want to edit or work with
